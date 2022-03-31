@@ -23,7 +23,6 @@ void add_product(void) {
     cin.ignore();
     getline(cin, new_product.product_name);
     cout << "Enter price: ";
-//    cin >> new_product.price;
     scanf("%d",&new_product.price);
     cout << "Enter category: ";
     cin.ignore();
@@ -66,15 +65,48 @@ void list_product(void) {
     }
 }
 
+void modify_product(void) {
+    string name;
+    cout << "Enter the product to modify: ";
+    cin.ignore();
+    getline(cin, name);
+    long idx {search_name(name)};
+    if (idx != -1) {
+        string m;
+        cout << "\n### Press Enter not to modify ###\n" << endl;
+        cout << "(Existing: " << name << ")" << endl;
+        cout << "Enter name: ";
+        getline(cin, m);
+        if (!empty(m))
+            Products[idx].product_name = m;
+            
+        
+        cout << "(Existing: " << Products[idx].price << ")" << endl;
+        cout << "Enter price: ";
+        getline(cin, m);
+        if (!empty(m))
+            Products[idx].price = stoi(m);
+        
+        cout << "(Existing: " << Products[idx].category << ")" << endl;
+        cout << "Enter category: ";
+        getline(cin, m);
+        if (!empty(m))
+            Products[idx].category = m;
+        
+        cout << '\n' << idx+1 << ". " << Products[idx].product_name << " / Price: " << put_money(Products[idx].price) << " / Category: " << Products[idx].category << "  Modified." << endl;
+    } else {
+        cout << name << " Not found." << endl;
+    }
+}
+
 int main() {
     cout.imbue(std::locale("ko_KR.UTF-8"));     // Korea
-    char command;
+    string command;
     while (1) {
-        cout << "\n(A : Add / D : Delete / F : Find / L : List / Q : Quit)" << endl;
+        cout << "\n(A : Add / D : Delete / F : Find / L : List / M : Modify / Q : Quit)" << endl;
         cout << "Enter the key: ";
-//        scanf(" %c", &command);
         cin >> command;
-        switch (command) {
+        switch (command[0]) {
             case 'A':
             case 'a':
                 add_product();
@@ -91,14 +123,16 @@ int main() {
             case 'l':
                 list_product();
                 break;
+            case 'M':
+            case 'm':
+                modify_product();
+                break;
             case 'Q':
             case 'q':
                 cout << "Program terminated." << endl;
                 exit(0);
             default:
                 cout << "Error(Unvalid key entered)" << endl;
-                string rem;
-                getline(cin,rem);
                 break;
         }
     }
