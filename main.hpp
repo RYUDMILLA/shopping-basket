@@ -1,10 +1,3 @@
-//
-//  main.hpp
-//  jangbaguni
-//
-//  Created by 류지훈 on 2022/03/29.
-//
-
 #ifndef main_hpp
 #define main_hpp
 
@@ -13,6 +6,8 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 //#include <ios>
 
-#endif /* main_hpp */
+#endif

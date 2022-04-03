@@ -10,6 +10,10 @@ typedef struct _Product{
 
 vector<Product> Products;
 
+string filename;
+
+// Functions
+
 long search_name(string name) {
     for (vector<Product>::iterator itr = Products.begin(); itr != Products.end(); ++itr)
         if ((*itr).product_name == name)
@@ -79,7 +83,6 @@ void modify_product(void) {
         getline(cin, m);
         if (!empty(m))
             Products[idx].product_name = m;
-            
         
         cout << "(Existing: " << Products[idx].price << ")" << endl;
         cout << "Enter price: ";
@@ -99,11 +102,55 @@ void modify_product(void) {
     }
 }
 
+// File I/O
+
+void open_file(void) {
+    cout << "Enter file name: ";
+    cin >> filename;
+    
+    ifstream fdata{filename};
+    string line,word;
+    Product f_product;
+    
+    if (fdata.is_open()) {
+        Products.clear();
+        while (getline(fdata, line)) {
+            stringstream str(line);
+            
+            getline(str,word,',');
+            f_product.product_name = word;
+            getline(str,word,',');
+            f_product.price = stoi(word);
+            getline(str,word);
+            f_product.category = word;
+            
+            Products.push_back(f_product);
+        }
+        cout << filename << " Opened." << endl;
+        fdata.close();
+    } else
+        cout << filename << " Not exist." << endl;
+}
+
+void save_file(void) {
+    if (filename.empty()) {
+        cout << "Which file? ";
+        cin >> filename;
+    }
+    ofstream fdata{filename};
+    
+    for (Product p: Products) {
+        fdata << p.product_name << ',' << p.price << ',' << p.category << endl;
+    }
+    cout << "Saved to " << filename << endl;
+    fdata.close();
+}
+
 int main() {
     cout.imbue(std::locale("ko_KR.UTF-8"));     // Korea
     string command;
     while (1) {
-        cout << "\n(A : Add / D : Delete / F : Find / L : List / M : Modify / Q : Quit)" << endl;
+        cout << "\n(A : Add / D : Delete / F : Find / L : List / M : Modify / O : Open / S : Save / Q : Quit)" << endl;
         cout << "Enter the key: ";
         cin >> command;
         switch (command[0]) {
@@ -126,6 +173,14 @@ int main() {
             case 'M':
             case 'm':
                 modify_product();
+                break;
+            case 'O':
+            case 'o':
+                open_file();
+                break;
+            case 'S':
+            case 's':
+                save_file();
                 break;
             case 'Q':
             case 'q':
