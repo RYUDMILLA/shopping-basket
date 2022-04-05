@@ -8,6 +8,10 @@
 #include <iomanip>
 #include <fstream>
 #include <sstream>
+#include <unistd.h>
+#include <termios.h>
+#include <sys/types.h>
+
 //#include <ios>
 
 #endif
