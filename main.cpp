@@ -2,6 +2,8 @@
 
 using namespace std;
 
+#define QUIT_TIMES 1
+
 typedef struct _Product{
     string category;
     string product_name;
@@ -11,6 +13,8 @@ typedef struct _Product{
 vector<Product> Products;
 
 string filename;
+bool dirty{false};
+static string newfile_num{"1"};
 
 // Functions
 
@@ -32,6 +36,7 @@ void add_product(void) {
     cin.ignore();
     getline(cin, new_product.category);
     Products.push_back(new_product);
+    dirty = true;
     cout << new_product.product_name << " Added." << endl;
 }
 
@@ -43,6 +48,7 @@ void delete_product(void) {
     long idx {search_name(name)};
     if (idx != -1) {
         Products.erase(Products.begin() + idx);
+        dirty = true;
         cout << name << " Deleted." << endl;
     } else {
         cout << name << " Not found." << endl;
@@ -95,7 +101,7 @@ void modify_product(void) {
         getline(cin, m);
         if (!empty(m))
             Products[idx].category = m;
-        
+        dirty = true;
         cout << '\n' << idx+1 << ". " << Products[idx].product_name << " / Price: " << put_money(Products[idx].price) << " / Category: " << Products[idx].category << "  Modified." << endl;
     } else {
         cout << name << " Not found." << endl;
@@ -104,10 +110,7 @@ void modify_product(void) {
 
 // File I/O
 
-void open_file(void) {
-    cout << "Enter file name: ";
-    cin >> filename;
-    
+void open_file(string filename) {
     ifstream fdata{filename};
     string line,word;
     Product f_product;
@@ -126,70 +129,111 @@ void open_file(void) {
             
             Products.push_back(f_product);
         }
+        dirty = false;
         cout << filename << " Opened." << endl;
         fdata.close();
     } else
-        cout << filename << " Not exist." << endl;
+        cout << filename << " Created." << endl;
+}
+
+void saveas_file(void) {
+    cout << "Save as: ";
+    cin >> filename;
+    if (filename.empty()) {
+        cout << "Save aborted." << endl;
+        return;
+    }
 }
 
 void save_file(void) {
     if (filename.empty()) {
-        cout << "Which file? ";
-        cin >> filename;
+        saveas_file();
     }
+    
     ofstream fdata{filename};
     
-    for (Product p: Products) {
-        fdata << p.product_name << ',' << p.price << ',' << p.category << endl;
+    if (fdata.is_open()) {
+        for (Product p: Products) {
+            fdata << p.product_name << ',' << p.price << ',' << p.category << endl;
+        }
+        fdata.close();
+        dirty = false;
+        cout << "Saved to " << filename << endl;
+        return;
     }
-    cout << "Saved to " << filename << endl;
-    fdata.close();
+    cout << "Save failed" << endl;
 }
 
-int main() {
-    cout.imbue(std::locale("ko_KR.UTF-8"));     // Korea
+void keyprocess(void) {
+    static int quit_times {QUIT_TIMES};
     string command;
+
+    cout << "\n(A : Add / D : Delete / M : Modify / F : Find / L : List / O : Open / S : Save / Q : Quit)" << endl;
+    cout << "Enter the key: ";
+    cin >> command;
+    switch (command[0]) {
+        case 'A':
+        case 'a':
+            add_product();
+            break;
+        case 'D':
+        case 'd':
+            delete_product();
+            break;
+        case 'F':
+        case 'f':
+            find_product();
+            break;
+        case 'L':
+        case 'l':
+            list_product();
+            break;
+        case 'M':
+        case 'm':
+            modify_product();
+            break;
+        case 'O':
+        case 'o':
+            cout << "Enter file name: ";
+            cin >> filename;
+            open_file(filename);
+            break;
+        case 'S':
+        case 's':
+            save_file();
+            break;
+        case 'Q':
+        case 'q':
+            if (dirty == true) {
+                cout << "File has unsaved changes." << endl;
+                while (quit_times > 0) {
+                    cout << "Enter Q " << quit_times << " more time to quit: ";
+                    cin >> command;
+                    if (command[0] != 'q')
+                        return;
+                    quit_times--;
+                }
+            }
+            cout << "Program terminated." << endl;
+            exit(1);
+        default:
+            cout << "Error(Unvalid key entered)" << endl;
+            break;
+    }
+}
+
+int main(int argc, char *argv[]) {
+    cout.imbue(std::locale("ko_KR.UTF-8"));     // Korea
+    if (argc >= 2) {
+        filename = argv[1];
+    } else {
+        filename = "Untitled-" + newfile_num + ".csv";
+        newfile_num = to_string(stoi(newfile_num) + 1);
+    }
+    open_file(filename);
+    
     while (1) {
-        cout << "\n(A : Add / D : Delete / F : Find / L : List / M : Modify / O : Open / S : Save / Q : Quit)" << endl;
-        cout << "Enter the key: ";
-        cin >> command;
-        switch (command[0]) {
-            case 'A':
-            case 'a':
-                add_product();
-                break;
-            case 'D':
-            case 'd':
-                delete_product();
-                break;
-            case 'F':
-            case 'f':
-                find_product();
-                break;
-            case 'L':
-            case 'l':
-                list_product();
-                break;
-            case 'M':
-            case 'm':
-                modify_product();
-                break;
-            case 'O':
-            case 'o':
-                open_file();
-                break;
-            case 'S':
-            case 's':
-                save_file();
-                break;
-            case 'Q':
-            case 'q':
-                cout << "Program terminated." << endl;
-                exit(0);
-            default:
-                cout << "Error(Unvalid key entered)" << endl;
-                break;
-        }
+        keyprocess();
     }
     return 0;
 }
