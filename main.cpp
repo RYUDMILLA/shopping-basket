@@ -240,6 +240,22 @@ void list_product(void) {
     }
 }
 
+void category(void) {
+    string s;
+    bool ex {false};
+    cout << "What category? ";
+    getline(cin, s);
+    
+    cout << "\nCategory : " << s << "\n\n";
+    for (vector<Product>::iterator itr = Products.begin(); itr != Products.end(); ++itr) {
+        if ((*itr).category == s) {
+            cout << left << setw(4) << (itr-Products.begin()+1) << setw(40) << (*itr).product_name << setw(10) << put_money((*itr).price) << endl;
+            ex = true;
+        }
+    }
+    if (ex == false) cout << "None." << endl;
+}
+
 // File I/O
 
 void open_file(string filename) {
@@ -328,6 +344,11 @@ void keyprocess(void) {
         case CTRL_KEY('l'):
             disableRawmode();
             list_product();
+            enableRawmode();
+            break;
+        case CTRL_KEY('c'):
+            disableRawmode();
+            category();
             enableRawmode();
             break;
         case CTRL_KEY('o'):
