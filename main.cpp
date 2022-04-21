@@ -167,11 +167,11 @@ void delete_product(void) {
         idx = search_name(s);
     
     if (idx >= 0 && idx < Products.end() - Products.begin()) {
+        cout << Products[idx].product_name << " Deleted." << endl;
         Products.erase(Products.begin() + idx);
         dirty = true;
-        cout << Products[idx].product_name << " Deleted." << endl;
     } else {
-        cout << Products[idx].product_name << " Not found." << endl;
+        cout << "Not found." << endl;
     }
 }
 
@@ -315,7 +315,7 @@ void save_file(void) {
 void keyprocess(void) {
     static int quit_times {QUIT_TIMES};
     write(STDOUT_FILENO, "\x1b[1E", 4);
-    cout << "\nCtrl + A : Add / D : Delete / M : Modify / F : Find / L : List / O : Open / S : Save / Q : Quit" << endl;
+    cout << "\nCtrl + A : Add / D : Delete / M : Modify / F : Find / L : List / C : Category / O : Open / S : Save / Q : Quit" << endl;
     write(STDOUT_FILENO, "\x1b[1E", 4);
     
     long c = readkey();
